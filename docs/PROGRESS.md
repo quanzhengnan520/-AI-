@@ -98,8 +98,17 @@ Alembic `0001_m0 → 0002_m1`，保留 M0 `schema_state`，新增：
 
 ## Git 与停止点
 
-实现快照提交：`07bd7428ca99dcf934f0d0bf47fd02e15cccd4a8`（`feat(m1): add persistent text records, reviewed memories and sourced retrieval`）。本进度随后以独立文档提交补记实际ID；没有远端推送。逐文件变更见 [M1_FILE_MANIFEST.md](M1_FILE_MANIFEST.md)，实现快照共62个变更文件。
+实现快照提交：`07bd7428ca99dcf934f0d0bf47fd02e15cccd4a8`（`feat(m1): add persistent text records, reviewed memories and sourced retrieval`）。验收文档提交：`ff304a629b1b43c8634610b8120888642f8e5e1a`。M1交付后，按用户提供的仓库地址完成GitHub同步，详见下文。逐文件变更见 [M1_FILE_MANIFEST.md](M1_FILE_MANIFEST.md)，实现快照共62个变更文件。
 
 此次并行代理中途触发使用额度限制，已由主代理接手后端挂载、补充测试与全部最终联调，未将中途代码当作完成。本机API与Expo Web已启动在8000/8081，日常资料库未导入测试故事，打开文字工作区后按README配对即可验收。
 
 **M1完成，等待用户验收；M2未启动。**
+
+## GitHub同步记录
+
+- 用户指定仓库：[quanzhengnan520/-AI-](https://github.com/quanzhengnan520/-AI-)，当前为Public公开仓库，保留现有可见性。
+- `main`同步M0已验收基线`61395e1`；`feat/m1-text-memory`同步M1完整实现及验收记录。未合并或覆盖M0基线。
+- 已核对远程分支提交与本地一致，两个分支均建立origin跟踪关系；M0/M1完整提交历史保留。
+- 未上传.env、数据库、配对码、设备令牌、运行日志、node_modules或本机验证产物。提交历史运行文件排除检查和常见密钥格式检查未发现匹配。
+- 初始Git代理端口失效，改用本机系统当前可用代理；以具有仓库写入权限的quanzhengnan520完成标准Git凭据管理器授权。凭据不进入项目文件或Git提交。
+- 此次只同步工程与更新记录；没有开展M2开发。
