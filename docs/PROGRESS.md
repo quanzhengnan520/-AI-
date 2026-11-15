@@ -98,4 +98,8 @@ Alembic `0001_m0 → 0002_m1`，保留 M0 `schema_state`，新增：
 
 ## Git 与停止点
 
-实现与验收已完成，提交ID在最终记录中补充。无远端推送。此次并行代理中途触发使用额度限制，已由主代理接手后端挂载、补充测试与全部最终联调，未将中途代码当作完成。当前停在M1，等待用户验收。
+实现快照提交：`07bd7428ca99dcf934f0d0bf47fd02e15cccd4a8`（`feat(m1): add persistent text records, reviewed memories and sourced retrieval`）。本进度随后以独立文档提交补记实际ID；没有远端推送。逐文件变更见 [M1_FILE_MANIFEST.md](M1_FILE_MANIFEST.md)，实现快照共62个变更文件。
+
+此次并行代理中途触发使用额度限制，已由主代理接手后端挂载、补充测试与全部最终联调，未将中途代码当作完成。本机API与Expo Web已启动在8000/8081，日常资料库未导入测试故事，打开文字工作区后按README配对即可验收。
+
+**M1完成，等待用户验收；M2未启动。**

@@ -86,6 +86,8 @@ npx.cmd expo export --platform web
 
 可选浏览器回归依赖 Playwright 和已安装的 Edge，使用全新浏览器上下文。smoke_ui.cjs 保留 M0 回归。完整手工路线、数据库/API 变更、实际通过数与风险见 [当前进度](docs/PROGRESS.md) 和 [M1 验收记录](docs/M1_ACCEPTANCE.md)；M0 历史见 [M0 验收记录](docs/M0_ACCEPTANCE.md)。
 
+本次逐文件变更见 [M1 文件清单](docs/M1_FILE_MANIFEST.md)。
+
 ## 配置与范围
 
 根 .env.example 仅供后端，安装复制到 services/api/.env；默认 MOCK_MODE=true、LIVE_AI_ENABLED=false。真实 API Adapter 的参数与逐次授权要求见 [M1 决策](docs/11_M1_DECISIONS.md)。本轮用模拟传输验证 Live 协议，没有付费模型调用。
