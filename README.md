@@ -98,6 +98,8 @@ npx.cmd expo export --platform web
 
 实际通过数、浏览器截图、未测试项目见 [docs/PROGRESS.md](docs/PROGRESS.md)。Jest/浏览器测试只能证明演示交互，不能证明真实模型或 iOS 后台能力。
 
+逐文件交付清单见 [docs/M0_FILE_MANIFEST.md](docs/M0_FILE_MANIFEST.md)。
+
 仓库另含可选的 `scripts/smoke_ui.cjs` 浏览器回归：需要 Playwright 和已安装的 Microsoft Edge，并先启动本地 API 与 Expo Web，再运行 `node .\scripts\smoke_ui.cjs`。本次使用现有工具环境提供的 Playwright，打开全新临时浏览器会话，不读取你的私人浏览器资料；运行结果与截图写入 `.artifacts/verification`。普通安装与手工验收不要求此工具。
 
 ## 手工验收路线
