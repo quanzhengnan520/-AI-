@@ -37,6 +37,7 @@ export default function TodayScreen() {
             <Text style={{ color: '#FFFFFF', fontSize: 22 }}>↗</Text>
           </Pressable>
         </View>
+        <Button title="文字工作区 · M1" onPress={() => router.push('/workspace')} />
         <Button title="＋ 开始记录 · 演示" onPress={() => setRecording(true)} />
         <Text style={[styles.small, { textAlign: 'center' }]}>
           当前使用合成数据，不采集麦克风 · 无云端模型调用

@@ -1,109 +1,101 @@
-# M0 交付与验收记录
+# M1 交付与验收记录
 
-日期：2026-11-15（Asia/Shanghai）。范围：只做 M0；**未开始 M1，等待用户验收**。
+日期：2026-11-15（Asia/Shanghai）。用户已初步验收 M0 并明确授权 M1。范围仅为真实文字记录、候选长期记忆与有来源检索；M1 完成后停止，等待用户验收，M2 未启动。
 
 ## 当前状态
 
-M0 工程与本机演示交付已完成，自动检查及浏览器验收通过；**等待用户最终验收**。当前记录不构成 iPhone 真机通过声明。
+M1 实现、自动检查和本机 Web 操作验收已完成，**等待用户验收，M2 未启动**。分支 `feat/m1-text-memory`，M0 起点 `61395e1`。历史 M0 的30项后端、19项移动端及浏览器12项记录保存在 [M0_ACCEPTANCE.md](M0_ACCEPTANCE.md)。原规范保持不变。
 
-## M0 验收项逐项核对
+M0 的30个后端用例继续运行；其中“业务路由尚不存在”随M1实现改为验证未配对401，旧迁移测试固定验证0001_m0，另加M1升级测试，未删除旧功能回归。移动端原19项保持通过。
 
-| M0 验收项 | 状态 | 依据 |
-|---|---|---|
-| 检查 Windows 开发环境、扫描原文件 | 通过 | 资料包只有规范与夹具；已补足项目内 npm / Python 环境 |
-| 仓库、目录、README、环境模板和锁文件 | 通过 | 本地 Git `main`；后端与移动端各有依赖锁 |
-| 四 Tab 与问答、提醒、记录 / 记忆详情、录音浮层 | 通过（浏览器） | 实际 Expo 开发服务器中的手机尺寸点击与导航 |
-| 全部演示内容标 Mock、不冒充真实 AI | 通过 | 页面固定标签；明确未保存音频、会话重置及预设回答 |
-| FastAPI 健康、版本、错误、Mock provider | 通过 | 真实 SQLite 查询、统一错误结构、LLM / ASR 分离 |
-| 默认不需要 Key、不连接云模型、有网络配置边界 | 通过 | Live 拒绝启用；只有用户点击连接检查才访问本机 API |
-| pytest、移动端类型检查、lint 和本地启动烟测 | 通过 | 统一检查脚本和真实进程 / 浏览器烟测均完成 |
-| README 中 Windows 步骤可用 | 通过 | Windows PowerShell 5.1 完整运行 `setup.ps1`、`check.ps1` 与两个启动脚本 |
-| 无真实用户音频上传 | 通过 | 没有麦克风和音频上传实现；浏览器未发现外部 HTTP 请求 |
-| iPhone 真机是否已测试 | 未测，已明示 | 没有连接实际手机，不宣称已安装或后台能力通过 |
-| 完成后停止 M0、更新进度 | 通过 | 本记录与交付文档已更新；M1 尚未开始 |
+## 实现范围
 
-## 环境检查
-
-| 项目 | 实际结果 |
+| 功能 | 实现与约束 |
 |---|---|
-| Windows PowerShell | 5.1 命令验证通过；Codex 终端 PowerShell 7.6.9 |
-| Node | 24.22.1 |
-| npm | 系统 PATH 缺失；项目 `.tooling` 提供 12.2.2 |
-| Python | 系统 `python` 是无效 Store 别名；现有运行时 3.12.14，已创建项目 `.venv` |
-| Git | 2.55.0.windows.3；资料包目录初始化本地 `main`，没有添加远端或推送 |
-| Expo | SDK 57；项目本地 CLI，无需全局安装 |
-| EAS | 未全局安装；M0 不使用云构建 |
-| Apple 账户 / 模型 Key | 未要求、未使用 |
+| 文字记录 | 创建、编辑、明确确认删除、SQLite持久化、UTC时间、版本冲突、历史来源版本 |
+| 手动关联 | 人物、项目、事件名称去重和共享实体关联，时间线、关键词检索与分页 |
+| 候选抽取 | 默认确定性 Mock，服务端可替换 Live API Adapter，Schema和逐字锚点校验 |
+| 证据与审核 | 来源记录/版本、精确引用/位置、时间、状态；确认/驳回/更正带乐观版本，修改仍待复核 |
+| 有来源回答 | 原文按时间引用，可打开证据；没有依据明确无法确认；不推断审批成立 |
+| 离线草稿 | 未加密本机持久存储、用户明确批准的不可变队列、固定幂等键、失败与重启恢复 |
+| 设备接入 | 一次性配对码、持久设备令牌哈希、私有API鉴权；统一/api/v1供后续客户端复用 |
+| 可追踪性 | 请求ID、无原文审计与最小模型用量日志；价格未知时为空，不虚构费用 |
 
-## 实现文件
+## 数据库变更
 
-| 位置 | 内容 |
+Alembic `0001_m0 → 0002_m1`，保留 M0 `schema_state`，新增：
+
+- `users/devices/pairing_codes/pairing_attempts`：单用户、设备认证、一次性码及限流。
+- `source_records/record_versions`：原始文字、发生/保存时间、版本及历史快照。
+- `entities/record_entities`：人物/项目/事件及记录关联。
+- `memory_facts/memory_versions`：候选、来源版本、原文锚点、语气、确认状态与审核历史。
+- `idempotency_entries`：同用户唯一键、请求摘要、记录ID；删除后保留无正文墓碑，拒绝复活。
+- `audit_events/model_usage`：无原文的操作审计、请求关联和最小计量。
+
+新增记录不会覆盖旧沟通。编辑使旧来源候选退出当前依据，旧版来源仍可定位。删除清理该记录正文、历史、派生记忆与孤立关联名称；不是磁盘安全擦除。30天保留字段仅为元数据，本阶段不自动清理。
+
+## API 变更
+
+所有成功为 `{data,request_id}`，错误为 `{error:{code,message,details},request_id}`。业务接口均需要配对设备 Bearer 令牌，M0演示令牌无权访问M1。
+
+| 方法与路径 | 用途 |
 |---|---|
-| `apps/mobile/src/app/` | 四 Tab、问答、提醒、记录详情、记忆详情 |
-| `apps/mobile/src/components/` | 公共界面、Mock 提示、模拟录音浮层 |
-| `apps/mobile/src/providers/` | 固定合成数据与演示回答 |
-| `apps/mobile/src/services/` | 会话状态与用户主动触发的 HTTP 连接检查 |
-| `apps/mobile/src/types/` | 领域类型 |
-| `apps/mobile/__tests__/` | 移动端演示行为和关键组件测试 |
-| `apps/mobile/package.json`、`package-lock.json` | Expo SDK 兼容的锁定依赖与检查命令 |
-| `apps/mobile/.env.example` | 仅本地 API 地址，无供应商凭据 |
-| `services/api/app/` | FastAPI、配置、鉴权、结构错误、SQLite、LLM / ASR 独立协议与 Mock |
-| `services/api/migrations/` | Alembic 工程元数据迁移基线 |
-| `services/api/tests/` | API、隐私错误边界、鉴权、provider、数据库测试 |
-| `services/api/pyproject.toml`、`requirements.lock` | Python 工程、Ruff / mypy / pytest 与依赖锁 |
-| `scripts/*.ps1` | 安装、启动、检查、本机测试令牌 |
-| `scripts/smoke_api.py` | 临时数据库与真实 Uvicorn 进程 HTTP 烟测 |
-| `scripts/smoke_ui.cjs` | 可选 Playwright / Edge 手机尺寸浏览器回归与截图 |
-| `apps/mobile/scripts/patch-query-string.js` | 严格、幂等的 SDK 57 URL 解码安全兼容补丁 |
-| `README.md`、`.env.example`、`.gitignore`、`.gitattributes` | Windows 启动手册、配置和仓库基础 |
-| `docs/10_M0_DECISIONS.md` | 本阶段工程选择、边界与官方依据 |
+| POST `/api/v1/auth/devices/pair` | 消费十分钟一次性码，发设备令牌 |
+| GET `/api/v1/auth/devices`、DELETE `/{device_id}` | 列出本用户设备/撤销设备；撤销后令牌拒绝访问 |
+| GET/POST `/api/v1/records` | 分页检索/创建；创建须UUID Idempotency-Key |
+| GET/PATCH/DELETE `/api/v1/records/{id}` | 查看（含version参数）/带expected_version编辑/明确确认删除 |
+| POST `/api/v1/records/{id}/extract` | 单独触发候选抽取；Live须逐次allow_live_ai |
+| GET `/api/v1/memories`、`/{id}` | 候选检索与详情 |
+| PATCH `/api/v1/memories/{id}` | 带版本确认、驳回、更正 |
+| POST `/api/v1/queries` | 有原文引用的保守检索回答 |
+| GET `/api/v1/entities` | 分页列出人工关联实体 |
+| GET `/api/v1/records/{id}/versions`、`/api/v1/memories/{id}/versions` | 记录版本目录/记忆审核历史 |
+| GET `/health`、`/api/v1/meta` | 保留无敏感数据探针和模式元数据 |
 
-原研发资料 `00_START_HERE.md`、`AGENTS.md`、`CODEX_FIRST_PROMPT.md`、`docs/01–09` 与合成夹具保留。上级目录的 ZIP、单文件合并需求书和用户第一条指令未修改。
+准确实现与配置见 [11_M1_DECISIONS.md](11_M1_DECISIONS.md)，启动见 [README](../README.md)，手工验收见 [M1_ACCEPTANCE.md](M1_ACCEPTANCE.md)。
 
-逐文件清单见 [M0_FILE_MANIFEST.md](M0_FILE_MANIFEST.md)，共 111 个跟踪文件（包含原规范和官方模板图标）。实现快照提交：`fab476a5e6c7080bdd1f16761c09e6a97a03e705`；使用本地 Codex 作者信息，无远端、无推送。此进度中的提交记录随后以独立文档提交补充。
+## 验证结果
 
-## 实际检查结果
+| 检查 | 实际结果 |
+|---|---|
+| 后端 pytest | **111通过，0失败**：M0 30 + Provider 57 + 检索7 + API边界16 + 迁移1 |
+| 移动端 Jest | **8套/54通过，0失败**：保留M0 19项，新增35项 |
+| 后端 Ruff lint/format、mypy | 通过；32个Python文件格式检查，22个实现文件类型检查 |
+| strict TypeScript、ESLint、Prettier | 通过；统一检查脚本由Windows PowerShell5.1执行，退出码0 |
+| Expo SDK依赖/Web导出 | 通过；SDK57兼容检查，实际生成Web dist |
+| M0真实HTTP烟测 | **6通过**；新M1服务代码仍支持旧健康/Mock/鉴权/错误契约 |
+| M1真实HTTP和进程重启 | **12通过**；临时SQLite、随机回环端口、真Uvicorn |
+| M0浏览器回归 | **12通过**；更新后API/Expo上复核原演示交互 |
+| M1浏览器操作验收 | **9通过**；Edge全新上下文、440×956，真实页面/API/独立临时库 |
+| SQLite迁移 | M0→M1→M0→M1通过，保留M0元数据；冻结迁移不依赖未来ORM模型 |
+| Windows配对脚本 | PS5.1隔离库执行通过，唯一文件、无凭据回显，测试码文件随后删除 |
+| pip check | 通过；Windows时区tzdata安装后Asia/Shanghai可用 |
+| npm audit生产依赖 | 0 critical、0 high；3 moderate、8 low尚存，未用强制大版本升级破坏Expo兼容 |
+| 实际云模型/iPhone真机 | **未测**，未发生真实模型调用或费用 |
 
-| 检查 | 结果 | 说明 |
-|---|---|---|
-| 后端 pytest | 通过，30 项 | 1 条上游 Starlette / HTTPX 弃用提示 |
-| 后端 Ruff lint / format | 通过 | 20 个 Python 文件符合格式 |
-| 后端 mypy | 通过 | 14 个实现文件 |
-| Python pip check | 通过 | 未发现依赖冲突 |
-| SQLite / Alembic | 通过 | 真实 `upgrade head`，WAL；仅 `schema_state` 与迁移元数据 |
-| 真实进程 API 烟测 | 通过，6 项 | 回环地址、临时库、随机临时令牌；健康/Mock 元数据/401/鉴权200/422/404 |
-| PowerShell 语法与运行时探测 | 通过 | PS 5.1 能调用项目 npm、Node 和 `.venv` Python |
-| PowerShell 完整安装复现 | 通过 | `npm ci` 重装 1071 个包，postinstall 自动应用补丁；模板复制与迁移完成 |
-| 令牌脚本隔离测试 | 通过 | 首次生成、哈希匹配、不回显、不隐式覆盖、显式轮换均验证 |
-| 移动端 strict TypeScript / lint / format | 通过 | 含依赖兼容补丁脚本 |
-| 移动端组件与规则测试 | 通过，4 套 / 19 项 | 搜索空态、模拟录音、审核/提醒、问答取消/拒答、连接错误、编码查询参数 |
-| Expo 依赖检查 / Web 导出 | 通过 | SDK 57 兼容包版本；Web 为单页应用 |
-| 浏览器手机尺寸交互 | 通过，12 项 | Playwright 1.62.1 / Edge headless，440×956；含中文查询参数证据深链、真实后端连接、无外部 HTTP 请求与无浏览器运行异常 |
-| iPhone 16 Pro Max / Expo Go | **未测** | 当前没有连接实际手机 |
-| 签名安装 / 后台录音 / 通知 | **未测** | M0 不包含真实能力、不需要账户；后续阶段另验收 |
+必测预算场景：三条原文与三次时间独立保存，关联同一人物/项目/事件；检索返回3条逐字引用，可点开高亮；回答明确不能据原文确认未被支持的结论，不生成“200万元预算曾获批准”，150万元不删除旧记录。候选被驳回或修改，不会抹去原始沟通历史。
 
-复核命令、逐步启动命令和手工验收路线详见根 `README.md`。本地验证产物均在 Git 忽略的 `.artifacts/verification/`，没有令牌或真实谈话：
+额外覆盖：原文空白/emoji保真、配对失效/过期/限流、跨用户隔离、6个并发相同键请求只建1条、旧版本409、显式null拒绝、模型错误/伪造锚点、抽取期间原文变更拒绝旧候选但保留用量日志、删除正文与版本/派生/孤立实体、服务端重启、离线刷新恢复及响应已提交但丢失后的幂等重试。
 
-- `setup.txt`：Windows PowerShell 5.1 完整安装记录。
-- `check.txt`：统一格式 / 类型 / 自动测试 / Expo 依赖检查最终结果。
-- `api-smoke.txt`、`api-smoke-server.log`：6 项真实进程 API 检查。
-- `ui-smoke.txt`：12 项浏览器检查。
-- `powershell-token-test.txt`：令牌脚本隔离测试摘要，不含凭据。
-- `home.png`、`recording-demo.png`、`record-detail.png`、`evidence.png`、`answer.png`、`reminders.png`、`settings.png`：真实运行页面截图。
+收尾复核增加组合请求体大小检查：中文正文与多个关联名虽然各字段合法，合计仍可能超过默认32KiB。现在客户端在入队前提示缩短/拆分并保留输入，避免无效内容进入不可变发送队列；该项已纳入第54个移动端测试。
 
-最后一次统一检查退出码为 0；没有把 iOS 原生能力纳入这些通过数。
+全部输入为虚构资料。浏览器操作验收由脚本驱动，已检查实际截图；不冒充人工iPhone真机测试。1条上游Starlette/HTTPX弃用提示未影响测试。首次HTTP验收发现测试脚本未关闭SQLite句柄，已修正并以退出码0重跑。
 
-## M0 范围与限制
+本机验证产物在Git忽略的 `.artifacts/verification/m1/`：`check.txt`、`http-smoke.txt`、`http-server.log`、`ui-smoke.txt`、`ui-server.log`、`web-export.txt`、`migration-freeze.txt`、`windows-pairing-script.txt`、`npm-audit.json`；截图为`record-and-extraction.png`、`memory-review.png`、`sourced-answer.png`、`offline-recovered.png`。M0回归产物仍在上一级verification目录。日志不含配对码、令牌或原始私人资料。
 
-- UI 使用内存合成数据。确认、驳回、待办和设置只改变本次会话，刷新后恢复，不声称已经持久保存。
-- 模拟录音只计时，不申请麦克风、不生成音频文件；无真人录音上传。
-- 问答是明确标识的预设演示；非示例问题演示依据不足。不能当作真实模型质量评测。
-- 后端只读 Mock 资源；真实文字记录、配对撤销、幂等写入、版本冲突、持久队列未做，属于后续阶段。
-- 没有启用云模型、ASR、推送、导出或真实删除，没有公网服务；SQLite 未加密，不能宣称端到端加密。
-- 局域网模式必须用户显式启动；后端会监听所有网卡，需自行维护可信网络和防火墙。默认只监听回环。
-- Node 依赖审计最终为 **0 严重 / 0 高危 / 8 中危 / 10 低危**；仍涉及 Expo / ESLint 的 minimatch 和 Jest / deepmerge 等上游工具依赖，不能宣称整个依赖树没有安全问题。URL 解码高危已修复并回归；其他问题保留到后续兼容升级，不能据此把当前原型直接公开部署。
-- URL 解码兼容补丁需要维护：安装必须执行 postinstall；不要使用 `npm ci --ignore-scripts`。升级 Expo / Router 时重新核对并在上游修复后移除此补丁。
+## 风险与未测项
 
-## 验收后的下一步
+- 当前无生产级SQLite、WAL、备份或草稿加密；不可用于真实敏感数据。
+- iPhone16 Pro Max/Expo Go、SecureStore原生行为、系统断网与杀进程未接实际设备验证；Web通过不等于iOS通过。
+- Live Adapter仅用MockTransport验证，真实供应商兼容性、质量、计费未实测。
+- 中文关键词检索和Mock逐句抽取存在语义漏召回，不具备M3跨记录自动冲突判断或向量检索能力。
+- 单用户本地POC，局域网HTTP仅虚构资料开发；未交付公网HTTPS、多租户或生产部署。
+- 离线新建草稿可恢复；旧服务端记录编辑需联网。已批准发送的正文锁定，以防响应丢失后改变幂等请求；错误需人工重试/处理。
+- Web草稿队列当前仅支持单标签页操作，尚无跨标签页写入锁；同时打开多个实例编辑草稿可能发生覆盖。本轮按单实例验收。
+- 检索最多扫描最新1000条记录、返回20条引用，每条最多2000字符；局限在答案中明示，不将未命中当成“历史上从未发生”。
+- 移动端按默认32KiB限制单条文字请求，较长内容需拆分；若部署者手工降低服务端请求上限，需同步调整客户端约束。分页为本地POC的偏移游标，翻页期间持续新增可能造成跨页重复。
+- 未实现录音、ASR、后台Worker、提醒、自动保留清理或导出；未进入M2。
 
-请先按 README 检查演示体验，并在 iPhone 上尝试 Expo Go。收到明确验收与开始 M1 的指令后，才实现设备配对、真实文字记录、可核验的记忆和持久化。本次在 M0 停止。
+## Git 与停止点
+
+实现与验收已完成，提交ID在最终记录中补充。无远端推送。此次并行代理中途触发使用额度限制，已由主代理接手后端挂载、补充测试与全部最终联调，未将中途代码当作完成。当前停在M1，等待用户验收。

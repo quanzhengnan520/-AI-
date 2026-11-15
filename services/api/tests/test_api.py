@@ -131,5 +131,6 @@ def test_unknown_origin_is_not_allowed(client: TestClient) -> None:
     assert "access-control-allow-origin" not in response.headers
 
 
-def test_real_business_routes_are_not_pretended_implemented(client: TestClient) -> None:
-    assert_error(client.post("/api/v1/records", json={}), 404, "NOT_FOUND")
+def test_business_routes_require_pairing_after_m1_implementation(client: TestClient) -> None:
+    # M0's unavailable endpoint becomes a protected M1 endpoint.
+    assert_error(client.post("/api/v1/records", json={}), 401, "UNAUTHORIZED")

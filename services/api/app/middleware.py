@@ -28,7 +28,7 @@ class RequestBoundary:
             received_bytes += len(message.get("body", b""))
             if received_bytes > self.max_request_bytes:
                 response = error_response(
-                    request_id, 413, "REQUEST_TOO_LARGE", "请求内容超过 M0 大小限制。"
+                    request_id, 413, "REQUEST_TOO_LARGE", "请求内容超过服务端大小限制。"
                 )
                 await response(scope, receive, send)
                 return

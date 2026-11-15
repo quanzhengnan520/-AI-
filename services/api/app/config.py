@@ -3,7 +3,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 API_ROOT = Path(__file__).resolve().parents[1]
@@ -11,7 +11,10 @@ API_ROOT = Path(__file__).resolve().parents[1]
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=API_ROOT / ".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=API_ROOT / ".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        hide_input_in_errors=True,
     )
 
     app_env: Literal["development", "test"] = "development"
@@ -22,7 +25,11 @@ class Settings(BaseSettings):
     device_token_sha256: str = Field(default="", repr=False)
     cors_origins: str = "http://localhost:8081,http://127.0.0.1:8081"
     max_request_bytes: int = Field(default=32768, ge=1024, le=1048576)
-    llm_provider: Literal["mock"] = "mock"
+    llm_provider: Literal["mock", "openai_compatible"] = "mock"
+    llm_base_url: str = ""
+    llm_model: str = ""
+    llm_api_key: SecretStr = Field(default=SecretStr(""), repr=False)
+    llm_allowed_hosts: str = ""
     asr_provider: Literal["mock"] = "mock"
 
     @field_validator("device_token_sha256")
@@ -42,8 +49,22 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def require_mock(self) -> "Settings":
-        if not self.mock_mode or self.live_ai_enabled:
-            raise ValueError("M0 supports Mock only; live providers are not implemented")
+        if self.llm_provider == "mock":
+            if not self.mock_mode or self.live_ai_enabled:
+                raise ValueError("Mock provider requires mock mode and Live disabled")
+        elif (
+            self.mock_mode
+            or not self.live_ai_enabled
+            or not all(
+                (
+                    self.llm_base_url,
+                    self.llm_model,
+                    self.llm_api_key.get_secret_value(),
+                    self.llm_allowed_hosts,
+                )
+            )
+        ):
+            raise ValueError("Live provider requires complete explicit server configuration")
         return self
 
     @property

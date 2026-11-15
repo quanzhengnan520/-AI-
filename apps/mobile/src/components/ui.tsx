@@ -18,7 +18,13 @@ export function Page({
   title,
   subtitle,
   action,
-}: PropsWithChildren<{ title: string; subtitle?: string; action?: React.ReactNode }>) {
+  demo = true,
+}: PropsWithChildren<{
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+  demo?: boolean;
+}>) {
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.page}>
@@ -32,9 +38,17 @@ export function Page({
           </View>
           {action}
         </View>
-        <DemoBanner />
+        {demo ? (
+          <DemoBanner />
+        ) : (
+          <View style={styles.banner}>
+            <Text style={styles.bannerText}>M1 本机资料库 · 请仅输入虚构测试资料</Text>
+          </View>
+        )}
         {children}
-        <Text style={styles.footer}>演示数据 · 所有人物与项目均为虚构</Text>
+        <Text style={styles.footer}>
+          {demo ? '演示数据 · 所有人物与项目均为虚构' : '文字与草稿尚未生产级加密 · 音频功能未接入'}
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );

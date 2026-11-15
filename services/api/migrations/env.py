@@ -2,6 +2,7 @@
 
 from alembic import context
 
+from app import models  # noqa: F401  -- register the M1 ORM metadata for Alembic checks
 from app.config import Settings
 from app.database import Base, create_database
 

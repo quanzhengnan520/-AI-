@@ -1,0 +1,50 @@
+{
+  "synthetic": true,
+  "description": "全部人物和项目均为虚构，仅用于M1文字闭环验收。",
+  "records": [
+    {
+      "kind": "text",
+      "title": "预算第一次沟通（虚构）",
+      "body_text": "王总表示项目预算预计为200万元。",
+      "captured_at": "2026-10-01T06:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "consent_confirmed": true,
+      "people": ["王总"],
+      "projects": ["星河示例项目"],
+      "events": ["预算沟通"]
+    },
+    {
+      "kind": "text",
+      "title": "审批进度沟通（虚构）",
+      "body_text": "王总表示预算尚未得到公司批准。",
+      "captured_at": "2026-10-10T06:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "consent_confirmed": true,
+      "people": ["王总"],
+      "projects": ["星河示例项目"],
+      "events": ["预算沟通"]
+    },
+    {
+      "kind": "text",
+      "title": "预算第三次沟通（虚构）",
+      "body_text": "王总表示目前只能考虑150万元。",
+      "captured_at": "2026-11-12T06:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "consent_confirmed": true,
+      "people": ["王总"],
+      "projects": ["星河示例项目"],
+      "events": ["预算沟通"]
+    }
+  ],
+  "questions": {
+    "budget": "王总的项目预算有哪些记录？预算曾经获得批准了吗？",
+    "unrelated": "木星明天的天气是多少度？"
+  },
+  "required": [
+    "三次原文独立持久保存",
+    "同一人物和项目关联",
+    "问答逐条引用原文",
+    "无法证明预算曾经批准",
+    "150万元新记录不删除200万元旧记录"
+  ]
+}

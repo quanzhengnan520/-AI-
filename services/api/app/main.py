@@ -13,6 +13,7 @@ from app.middleware import RequestBoundary
 from app.providers.base import ASRProvider, LLMProvider
 from app.providers.mock import MockASRProvider, MockLLMProvider
 from app.routers.system import router
+from app.routers.workspace import router as workspace_router
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -25,8 +26,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         engine.dispose()
 
     application = FastAPI(
-        title="个人第二大脑 · M0 Mock API",
-        version="0.0.1",
+        title="个人第二大脑 · M1 Text Memory API",
+        version="0.1.0",
         lifespan=lifespan,
         # Avoid loading external Swagger/ReDoc assets on the local-first default.
         docs_url=None,
@@ -48,11 +49,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=settings.allowed_origins,
-        allow_methods=["GET"],
-        allow_headers=["Authorization", "Content-Type"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "Idempotency-Key", "X-Request-ID"],
         expose_headers=["X-Request-ID"],
     )
     application.include_router(router)
+    application.include_router(workspace_router)
     return application
 
 

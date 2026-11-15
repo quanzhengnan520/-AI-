@@ -24,6 +24,7 @@ export default function RootLayout() {
           <Stack.Screen name="reminders" options={{ title: '待办与提醒' }} />
           <Stack.Screen name="record/[id]" options={{ title: '记录详情' }} />
           <Stack.Screen name="memory/[id]" options={{ title: '记忆详情' }} />
+          <Stack.Screen name="workspace" options={{ title: '文字工作区 · M1' }} />
         </Stack>
       </DemoContext.Provider>
     </SafeAreaProvider>
